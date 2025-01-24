@@ -1,0 +1,104 @@
+openapi: 3.0.1
+info:
+  title: MyApi.WebApi
+  version: "1.0"
+paths:
+  /WeatherForecast:
+    get:
+      tags:
+        - WeatherForecast
+      operationId: GetWeatherForecast
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeatherForecast"
+              examples:
+                weathers:
+                  value:
+                    - date: "2024-12-16"
+                      temperatureC: 3
+                      temperatureF: 0
+                      summary: "string"
+                    - date: "2024-12-22"
+                      temperatureC: 15
+                      temperatureF: 25
+                      summary: "string"
+                    - date: "2024-12-31"
+                      temperatureC: 34
+                      temperatureF: 55
+                      summary:
+                weathers2:
+                  value:
+                    - date: "2024-12-16"
+                      temperatureC: 3
+                      temperatureF: 0
+                      summary: "string"
+                    - date: "2024-12-22"
+                      temperatureC: 15
+                      temperatureF: 25
+                      summary: "string"
+                    - date: "2024-12-31"
+                      temperatureC: 34
+                      temperatureF: 55
+                      summary: "SUMMARY"
+  /WeatherForecast/{date}:
+    get:
+      tags:
+        - WeatherForecast
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          examples:
+            weather-1:
+              value: '2024-12-16'
+            weather-2:
+              value: '2024-12-17'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                weather-1:
+                  value:
+                    - date: "2024-12-16"
+                      temperatureC: 3
+                      temperatureF: 0
+                      summary: "string"
+                weather-2:
+                  value:
+                    - date: "2024-12-17"
+                      temperatureC: 3
+                      temperatureF: 0
+                      summary: "string"
+
+components:
+  schemas:
+    WeatherForecast:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        temperatureC:
+          type: integer
+          format: int32
+        temperatureF:
+          type: integer
+          format: int32
+          readOnly: true
+        summary:
+          type: string
+          nullable: true
+      additionalProperties: false
