@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="OpenAPIs\geocode.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <OpenApiReference Include="OpenAPIs\geocode.yaml" CodeGenerator="NSwagCSharp" Namespace="MyApi.WebApi.Services" Options="/GenerateBaseUrlProperty:false /useBaseUrl:false /GenerateExceptionClasses:false" ClassName="GeoCodeAPI" />
+    <OpenApiReference Include="OpenAPIs\openapi2.yml" CodeGenerator="NSwagCSharp" Namespace="MyApi.WebApi.Services" Options="/GenerateBaseUrlProperty:false /useBaseUrl:false" ClassName="OpenMeteoApi">
+      <SourceUri>https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml</SourceUri>
+    </OpenApiReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="13.18.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+    <ItemGroup>
+        
+        <None Update="\OpenAPIs\openapi2.yml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="\OpenAPIs\geoCode.yml">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>
