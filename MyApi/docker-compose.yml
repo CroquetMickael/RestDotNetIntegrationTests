@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  mycrocks:
+    image: quay.io/microcks/microcks-uber:latest-native
+    container_name: microcks
+    ports:
+      - "8585:8080"
+
+  weather-api:
+    build:
+      context: ./MyApi.WebApi/
+      dockerfile: Dockerfile
+      args:
+        buildImage: dvaew1afahubacr02.azurecr.io/factory/build/linux/dotnet:8.0-ubi9
+        runtimeImage: dvaew1afahubacr02.azurecr.io/factory/runtime/linux/dotnet:8.0-ubi9
+
+    image: weather/api
+    container_name: weather-api
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__WeatherContext=Data Source=mssql-db;Initial Catalog=Weather;User Id=Sa;Password=<YourStrong@Passw0rd>;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
+    ports:
+      - "40040:8080"
+
+  mssql-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "<YourStrong@Passw0rd>"
+      MSSQL_DATA_DIR: /var/opt/mssql/data
+      MSSQL_TCP_PORT: 1433
+    ports:
+      - "2024:1433"
