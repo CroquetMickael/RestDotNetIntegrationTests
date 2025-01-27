@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  mycrocks:
+    image: quay.io/microcks/microcks-uber:latest-native
+    container_name: microcks
+    ports:
+      - "8585:8080"
+
+  mssql-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "<YourStrong@Passw0rd>"
+      MSSQL_DATA_DIR: /var/opt/mssql/data
+      MSSQL_TCP_PORT: 1433
+    ports:
+      - "2024:1433"
