@@ -20,4 +20,8 @@ L'accompagnement sera très présent au début, puis s'atténuera progressivemen
 
 ### [Module 1: Ajout d'un service externe](./modules/Module%201%20Ajout%20du%20service%20meteo/readme.md)
 
-### [Module 2 Ajout des tests du service externe](./modules/Module%202%20Ajout%20des%20tests%20du%20service%20externe/readme.md)
+### [Module 2: Ajout des tests du service externe](./modules/Module%202%20Ajout%20des%20tests%20du%20service%20externe/readme.md)
+
+### [Module 3: Usage de Microcks](./modules/Module%203%20Usage%20de%20Microcks/readme.md)
+
+### [Module 4: Modification des tests pour utiliser Microcks](./modules/Module%202%20Ajout%20des%20tests%20du%20service%20externe/readme.md)
