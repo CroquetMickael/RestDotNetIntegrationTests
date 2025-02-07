@@ -24,4 +24,4 @@ L'accompagnement sera très présent au début, puis s'atténuera progressivemen
 
 ### [Module 3: Usage de Microcks](./modules/Module%203%20Usage%20de%20Microcks/readme.md)
 
-### [Module 4: Modification des tests pour utiliser Microcks](./modules/Module%202%20Ajout%20des%20tests%20du%20service%20externe/readme.md)
+### [Module 4: Ajustement des tests pour usage de Microcks](./modules/Module%204%20Ajustement%20des%20tests%20pour%20usage%20de%20Microcks/readme.md)

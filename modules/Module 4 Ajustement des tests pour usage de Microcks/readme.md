@@ -1,39 +1,108 @@
-# Module 3: Usage de Microcks
+# Module 4: Ajustement des tests pour usage de Microcks
 
 Démarrer avec le projet du module précédent:
 
 ```
-git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module2
+git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module3
 ```
 
-## Démarrage du Docker Compose
+## Préambule
 
-### Podman
+Vérifier que vous avez bien `Podman` ou `Docker` de lancer pour pouvoir continuer ce Module.
 
-Pour Podman, pensez à démarre votre machine `podman machine start` et lancer la commande `podman-compose up -d` dans le dossier `MyApi`.
+## Ajout du package Microcks et usage du test Container
 
-### Docker
+Dans un premier temps, nous allons installer Microcks dans la solution de test, le package Nuget ce nomme : `Microcks.Testcontainers`
 
-Démarrer votre Docker Desktop et lancer la commande `docker-compose up -d` dans le dossier `MyApi`.
+Une fois cela fait, nous allons modifier notre hook de démarrage, nous allons ajouter 2 paramètres, un public, l'autre privée qui seront utiliser pour démarrer le test container de Microcks.
 
-Lancer ensuite votre navigateur sur l'URL [http://localhost:8585](http://localhost:8585).
+```cs
+internal class InitWebApplicationFactory
+{
+    ***
+    private MicrocksContainer _microcksContainer = null!;
+    internal string _microcksUrl = "";
+```
 
-Vous devriez arrivé sur cette page:
+Une fois cela fait, nous allons créer une nouvelle méthode privée pour démarrer le test Container:
 
-![Microcks home](./img/microcks.png)
+```cs
+ private async Task CreateApiTestcontainer()
+    {
+        _microcksContainer = new MicrocksBuilder()
+           .WithImage("quay.io/microcks/microcks-uber:1.10.0")
+            .WithMainArtifacts("C:\\Formation\\DotNetIntegrationTests\\MyApi\\MyApi.WebApi\\OpenAPIs\\openapi2.yml")
+            .WithSecondaryArtifacts("C:\\Formation\\DotNetIntegrationTests\\MyApi\\MyApi.WebApi.Tests\\Mocks\\OpenMeteo\\openmeteomocks.yml")
+           .Build();
+        await _microcksContainer.StartAsync();
+        Uri microcksURI = _microcksContainer.GetRestMockEndpoint("Open-Meteo APIs", "1.0/v1");
+        _microcksUrl = microcksURI.toString();
 
-## Modification d'un fichier openapi
+    }
+```
 
-Pour que Microcks fonctionne et surcharge la référence de votre API avec des examples qui lui sont propre, nous allons donc créer un nouveau fichier `openapi.yml` qui nous sera propre et qui sera réutilisé pour nos mocks dans nos test plus tard.
+Nous devons aussi modifier notre `ReplaceExternalServices` pour que notre HttpClient contacte maintenant, Microcks.
 
-Créons un dossier `Mocks` et un sous dossier `OpenMeteo` dans le projet de test .net à la racine.
+```cs
+  private static void ReplaceExternalServices(IServiceCollection services, ScenarioContext scenarioContext, string microcksUrl)
+    {
+        services.AddHttpClient<OpenMeteoApi>(client =>
+        {
+            client.BaseAddress = new Uri(microcksUrl);
+        });
+    }
+```
 
-Dupliquer le `.yml` qui est sur cette URL: [https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml](https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml) dans un fichier que vous nommerez `openmeteomocks.yml`.
+Comme vous pouvez constater, nous avons retirer le `HttpMessageHandlerMeteoService`, cela veut maintenant dire que `.net` va utiliser directement l'url fournit par nous même.
 
-Une fois cela fait, nous modifions le fichier pour y rajouter des examples:
+Et pour finir, nous devons démarrer le container au début de chaque scénario, le `BeforeScenario` est prévu pour ça:
+
+```cs
+[BeforeScenario]
+    public async Task BeforeScenario(ScenarioContext scenarioContext, IObjectContainer objectContainer)
+    {
+        _msSqlContainer = new MsSqlBuilder().Build();
+        await _msSqlContainer.StartAsync();
+        await PopulateDatabaseAsync();
+        await InitializeRespawnAsync();
+        await CreateApiTestcontainer();
+        var application = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                RemoveLogging(services);
+                ReplaceDatabase(services, objectContainer);
+                ReplaceExternalServices(services, scenarioContext, _microcksUrl);
+            });
+        });
+
+    var client = application.CreateClient();
+
+        scenarioContext.TryAdd(HttpClientKey, client);
+        scenarioContext.TryAdd(ApplicationKey, application);
+    }
+```
+
+Vous pouvez lancer les tests, Vous aurez normalement des tests en erreur.
+
+## Correction de l'erreur
+
+Microcks a une particularité en mode test Container, il est très \*\* sur le fait que le document doit être à l'exactitude de vos paramètres d'entrée dans l'URL, que ce soit par le path ou les query params.
+
+De ce fait, dans notre précédent schéma Open API, nous n'avions pas pris en compte les paramètres suivant :
+
+- current_weather
+- temperature_unit
+- timezone
+
+Il faut donc rajouter des examples dans notre `openmeteomocks.yml` pour ces trois paramêtres pour notre `minmaxdaily` avec les valeurs suivante:
+
+- current_weather = false
+- temperature_unit = celsius
+- timezone = GMT.
 
 <details>
-<summary>Schema OpenAPI</summary>
+<summary>Correction</summary>
 <br>
 
 ```yml
@@ -157,6 +226,9 @@ paths:
           in: query
           schema:
             type: boolean
+          examples:
+            minmaxdaily:
+              value: false
         - name: temperature_unit
           in: query
           schema:
@@ -165,6 +237,9 @@ paths:
             enum:
               - celsius
               - fahrenheit
+          examples:
+            minmaxdaily:
+              value: celsius
         - name: wind_speed_unit
           in: query
           schema:
@@ -189,6 +264,9 @@ paths:
           description: If `timezone` is set, all timestamps are returned as local-time and data is returned starting at 0:00 local-time. Any time zone name from the [time zone database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) is supported.
           schema:
             type: string
+          examples:
+            minmaxdaily:
+              value: GMT
         - name: past_days
           in: query
           description: If `past_days` is set, yesterdays or the day before yesterdays data are also returned.
@@ -266,14 +344,14 @@ paths:
                         - "23.5"
                         - "23.5"
                         - "23.3"
-                    temperature_2m_max:
-                      - "25.0"
-                      - "25.2"
-                      - "25.0"
-                      - "24.5"
-                      - "24.6"
-                      - "24.5"
-                      - "24.8"
+                      temperature_2m_max:
+                        - "25.0"
+                        - "25.2"
+                        - "25.0"
+                        - "24.5"
+                        - "24.6"
+                        - "24.5"
+                        - "24.8"
         400:
           description: Bad Request
           content:
@@ -543,40 +621,4 @@ components:
 
 </details>
 <br>
-Le fichier étant un peu grand, faites une recherche sur minmaxdaily pour voir les modifications apporté.
-
-### Usage du fichier dans Microcks
-
-Retourner sur l'URL de Microcks et cliquer sur `Importers` et cliquer sur `upload`.
-
-![MicrocksUpload](./img/MicrocksUpload.png)
-
-Une fois fait, choisisser votre fichier.
-
-Allez ensuite dans `API | Services`, vous devriez voir votre api custom.
-
-![Microcks api](./img/microcksapi.png)
-
-Rentrer dedans et vous devriez voir 1 définition d'appel dans les opérations.
-
-Si vous cliquer dessus et que vous copier l'URL (via le bouton de copie) et que vous mettez cette URL dans votre navigateur, vous aurez alors un retour API avec les données que nous avons fournit.
-
-### Tester la définition customiser avec la vrai API.
-
-Le point positif de Microcks en dehors de fournir un serveur qui répond des mocks prédéfinit au seins des tests et de permettre de comparé le retour d'une API vs la définition custom que vous lui avez donné.
-
-Si votre API ne répond pas à la norme openAPI, le test passera en erreur, nous allons donc tester que notre définition est valide.
-
-Pour ce faire cliquer sur `New Test`:
-
-Dans test Endpoint, nous mettrons l'URL du service : https://api.open-meteo.com
-
-Dans Runner, vous avez 2 possibilité:
-
-- HTTP: Il lancera un vrai appel API et il vérifie simplement que le code de retour est équivalent avec votre mock.
-
-- OPEN API SCEMA: Il effectue aussi un appel et il vérifie que la réponse est équivalente a ce que vous lui avez proposé dans votre mock.
-
-Vous pouvez tester les 2 cas, vous devriez normalement avoir 2 tests résult en succès.
-
-[suivant >](../../modules/Module%204%20Ajustement%20des%20tests%20pour%20usage%20de%20Microcks/readme.md)
+Si vous relancez les tests, cela devrait maintenant être ok 😊.
