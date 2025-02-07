@@ -622,3 +622,9 @@ components:
 </details>
 <br>
 Si vous relancez les tests, cela devrait maintenant être ok 😊.
+
+Un repo contenant une solution est disponible ici:
+
+```
+git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module4
+```
