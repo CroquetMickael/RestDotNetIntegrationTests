@@ -252,4 +252,8 @@ Lancez vos tests et vous devriez normalement avoir ce résultat:
 
 ![Test en succès](./img/TestSuccess.png)
 
+```
+git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module2
+```
+
 [suivant >](../../modules/Module%203%20Usage%20de%20Microcks/readme.md)

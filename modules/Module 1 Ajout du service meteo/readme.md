@@ -243,4 +243,8 @@ Vous devriez avoir une réponse de ce style :
 }
 ```
 
+```
+git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module1
+```
+
 [suivant >](../Module%202%20Ajout%20des%20tests%20du%20service%20externe/readme.md)

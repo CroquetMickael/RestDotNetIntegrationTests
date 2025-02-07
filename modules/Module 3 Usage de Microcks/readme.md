@@ -579,4 +579,10 @@ Dans Runner, vous avez 2 possibilité:
 
 Vous pouvez tester les 2 cas, vous devriez normalement avoir 2 tests résult en succès.
 
+Un repo contenant une solution est disponible ici:
+
+```
+git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module3
+```
+
 [suivant >](../../modules/Module%204%20Ajustement%20des%20tests%20pour%20usage%20de%20Microcks/readme.md)
