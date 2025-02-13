@@ -10,7 +10,7 @@ git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --bra
 
 ### Podman
 
-Pour Podman, pensez à démarre votre machine `podman machine start` et lancer la commande `podman-compose up -d` dans le dossier `MyApi`.
+Pour Podman, pensez à démarrer votre machine `podman machine start` et lancer la commande `podman-compose up -d` dans le dossier `MyApi`.
 
 ### Docker
 
@@ -18,13 +18,48 @@ Démarrer votre Docker Desktop et lancer la commande `docker-compose up -d` dans
 
 Lancer ensuite votre navigateur sur l'URL [http://localhost:8585](http://localhost:8585).
 
-Vous devriez arrivé sur cette page:
+Vous devriez arriver sur cette page:
 
 ![Microcks home](./img/microcks.png)
+
+### Que c'est-il passé ?
+
+Microcks démarre un serveur pour fournir un environnement dans lequel les APIs simulées (mocks) peuvent être hébergées et accessibles. Cela peut être utilisé pour plusieurs raison :
+
+1. **Accessibilité des Mocks** : En démarrant un serveur, Microcks permet aux développeurs d'accéder aux mocks d'API via des endpoints HTTP. Cela permet aux utilisateurs de tester leurs applications comme s'ils interagissaient avec une API réelle.
+
+2. **Tests Locaux** : Un serveur local offre aux développeurs la possibilité de tester leurs applications sans dépendre d'une API externe, ce qui est particulièrement utile pour le développement local, les tests unitaires, et les tests d'intégration.
+
+3. **Simulation du Comportement de l'API** : Le serveur peut simuler des comportements spécifiques de l'API, comme des réponses réussies, des erreurs ou des délais, permettant aux développeurs de vérifier comment leur application réagit dans différentes situations.
+
+4. **Collaboration** : En ayant un serveur en cours d'exécution, les membres de l'équipe peuvent accéder aux mocks et les tester facilement. Cela facilite la collaboration entre les développeurs, les testeurs et les parties prenantes.
+
+5. **Intégration dans des Pipelines CI/CD** : Dans le cadre d'un processus d'intégration continue et de déploiement continu (CI/CD), un serveur peut être utilisé pour effectuer des tests automatisés sur les mocks d'API, garantissant ainsi que les modifications apportées au code n'introduisent pas de régressions.
+
+En résumé, le démarrage d'un serveur par Microcks permet de créer un environnement de test réaliste et accessible pour les développeurs, ce qui améliore l'efficacité du développement et la qualité des applications.
 
 ## Modification d'un fichier openapi
 
 Pour que Microcks fonctionne et surcharge la référence de votre API avec des examples qui lui sont propre, nous allons donc créer un nouveau fichier `openapi.yml` qui nous sera propre et qui sera réutilisé pour nos mocks dans nos test plus tard.
+
+### Qu'est-ce qu'OpenAPI ?
+
+OpenAPI est une spécification utilisée pour décrire les API RESTful. Elle permet de définir de manière standardisée les endpoints d'une API, les méthodes HTTP supportées, les paramètres, les formats de réponse, et bien plus encore.
+
+L'objectif principal d'OpenAPI est de faciliter la compréhension, l'utilisation et l'intégration des API par les développeurs.
+
+#### Caractéristiques principales
+
+- **Documentation claire** : OpenAPI permet de générer automatiquement la documentation de l'API, ce qui rend son utilisation plus intuitive.
+- **Interopérabilité** : Grâce à sa spécification standard, les outils et bibliothèques peuvent facilement interagir avec les APIs décrites en OpenAPI.
+- **Génération de code** : À partir d'une définition OpenAPI, il est possible de générer du code client ou serveur, ce qui accélère le développement.
+
+**Pour en savoir plus**
+Pour approfondir vos connaissances sur OpenAPI, vous pouvez consulter les ressources suivantes :
+
+- [Documentation officielle d'OpenAPI](https://swagger.io/specification/)
+- [Guide pratique sur OpenAPI](https://learn.openapis.org)
+- [Tutoriel sur Swagger et OpenAPI](https://grafikart.fr/tutoriels/swagger-openapi-php-1160)
 
 Créons un dossier `Mocks` et un sous dossier `OpenMeteo` dans le projet de test .net à la racine.
 
@@ -559,7 +594,9 @@ Allez ensuite dans `API | Services`, vous devriez voir votre api custom.
 
 Rentrer dedans et vous devriez voir 1 définition d'appel dans les opérations.
 
-Si vous cliquer dessus et que vous copier l'URL (via le bouton de copie) et que vous mettez cette URL dans votre navigateur, vous aurez alors un retour API avec les données que nous avons fournit.
+![Detail API](./img/detailapi.png)
+
+Cliquer sur la définition de votre route API, vous pouvez ainsi copier l'URL fournit, renseignez la dans votre navigateur, vous aurez alors un retour API avec les données que nous avons fournit.
 
 ### Tester la définition customiser avec la vrai API.
 
@@ -577,7 +614,9 @@ Dans Runner, vous avez 2 possibilité:
 
 - OPEN API SCEMA: Il effectue aussi un appel et il vérifie que la réponse est équivalente a ce que vous lui avez proposé dans votre mock.
 
-Vous pouvez tester les 2 cas, vous devriez normalement avoir 2 tests résult en succès.
+Vous pouvez tester les 2 cas, vous devriez normalement alors avoir 1 des 2 cas de test en succès.
+
+**Pourquoi ?** Il s'avére que l'API que nous utilisons ne respecte pas exactement le standard OPEN API, Microcks permet aussi de détecter ce genre de soucis.
 
 Un repo contenant une solution est disponible ici:
 
