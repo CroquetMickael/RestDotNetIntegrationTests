@@ -21,7 +21,7 @@ Scenario: Get weather forecast for 7 days
         | 2025-01-10 |
         | 2025-01-11 |
         | 2025-01-12 |
-    Given The minimal temperatures are:
+    And The minimal temperatures are:
         | Min  |
         | 23.0 |
         | 24.3 |
@@ -30,7 +30,7 @@ Scenario: Get weather forecast for 7 days
         | 23.5 |
         | 23.5 |
         | 23.3 |
-    Given The maximum temperatures are:
+    And The maximum temperatures are:
         | Max  |
         | 25.0 |
         | 25.2 |
@@ -39,7 +39,7 @@ Scenario: Get weather forecast for 7 days
         | 24.6 |
         | 24.5 |
         | 24.8 |
-    Given The external service forecast respond
+    And The external service forecast respond
     When I make a GET request to 'weatherforecast/sevendayminmax' with:
         | Latitude | Longitude |
         | 14.2     | 52.2      |
@@ -210,7 +210,7 @@ Par la suite, nous allons modifier le hook de démarrage de nos tests pour perme
     {
         services.AddHttpClient<OpenMeteoApi>(client =>
         {
-            client.BaseAddress = new Uri("http://toto");
+            client.BaseAddress = new Uri("http://whateverurl");
         })
                 .ConfigurePrimaryHttpMessageHandler(() =>
                 {

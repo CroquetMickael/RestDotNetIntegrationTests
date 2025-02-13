@@ -33,6 +33,8 @@ Puis remplir avec les informations suivante:
 
 ![Informations du service](img/ConnectedServiceFinalAddOpenAPI.png)
 
+Un fichier `.yml` va être généré avec le nom fournit, avec le nom que vous lui avez fournit, ici OpenMeteoApi donc `OpenMeteoApi.yml`
+
 ## Usage du nouveau service
 
 Dans le projet MyApi.WebApi, créer un dossier `Services` et ajouter 3 classes:

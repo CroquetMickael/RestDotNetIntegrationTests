@@ -41,6 +41,66 @@ Une fois cela fait, nous allons créer une nouvelle méthode privée pour démar
     }
 ```
 
+### Que fait cette fonction ?
+
+- `.WithImage("quay.io/microcks/microcks-uber:1.10.0")`: Cela permet de définir l'image docker que l'ont va utiliser dans nos tests, il est souvent conseiller d'éviter de mettre `latest` dans les tests pour éviter d'avoir des soucis en cas de monté de version non prévu.
+
+#### Les artifacts
+
+Dans Microcks, les termes **primaryArtifact** et **secondaryArtifact** se réfèrent à des types d'artéfacts utilisés pour définir et simuler des APIs. Voici une explication des différences entre ces deux concepts :
+
+#### Primary Artifact
+
+Définit par `WithMainArtifacts` dans notre fonction.
+
+- **Rôle** : Cet artéfact est utilisé pour générer les mocks d'API et pour effectuer des tests basés sur les spécifications qu'il contient. Il sert de base pour la simulation et le comportement attendu de l'API.
+- **Importance** : C'est l'élément central sur lequel repose l'ensemble de l'interaction avec l'API simulée.
+
+#### Secondary Artifact
+
+Définit par `WithSecondaryArtifacts` dans notre fonction.
+
+- **Rôle** : Ces artéfacts secondaires peuvent être utilisés pour fournir des données de test, des schémas supplémentaires, ou des configurations spécifiques qui ne sont pas couvertes par le primaryArtifact. Ils permettent d'ajouter de la richesse et de la diversité aux simulations.
+- **Importance** : Bien qu'ils ne soient pas essentiels au fonctionnement de l'API simulée, les secondaryArtifacts peuvent améliorer les tests et les interactions en fournissant des contextes ou des données supplémentaires.
+
+### En résumé
+
+- **Primary Artifact** : Artéfact principal qui définit l'API et sert de base pour les mocks et les tests.
+- **Secondary Artifact** : Artéfact supplémentaire qui enrichit ou complète le primaryArtifact, offrant des données ou des configurations supplémentaires.
+
+#### Démarrer le container et récupérer l'URL
+
+```cs
+await _microcksContainer.StartAsync();
+Uri _microcksUrl = _microcksContainer.GetRestMockEndpoint("Open-Meteo APIs", "1.0/v1");
+```
+
+Ces deux lignes font principalement 2 chose:
+
+- La première ligne démarre le test container de Microcks.
+- La deuxiéme ligne récupére l'URI de notre service, en passant le Endpoint que l'on souhaite, ce endpoint est basé sur le openapi.yml que l'on a fournit dans la section `info` avec la propriété `title`
+
+```yml
+openapi: 3.0.0
+info:
+  title: Open-Meteo APIs
+  description: "Open-Meteo offers free weather forecast APIs for open-source developers and non-commercial use. No API key is required."
+  version: "1.0"
+```
+
+### C'est quoi un test container ?
+
+Un test container est une méthode de test qui utilise des containers pour exécuter des tests d'application dans un environnement isolé et reproductible. Cela permet de simuler des environnements de production et de s'assurer que le code fonctionne correctement avant d'être déployé.
+
+#### Avantages des Test Containers
+
+1. **Isolation** : Chaque test s'exécute dans un environnement propre, évitant les interférences entre les tests.
+2. **Reproductibilité** : Les tests peuvent être exécutés dans le même environnement à chaque fois, ce qui réduit les problèmes liés à des différences d'environnement.
+3. **Scalabilité** : Les containers peuvent être facilement créés et détruits, permettant de faire tourner des tests en parallèle.
+4. **Intégration facile** : Ils s'intègrent bien avec les outils de CI/CD, facilitant l'automatisation des tests.
+
+## Modifier le HTTP Client de test pour utiliser la nouvelle URL
+
 Nous devons aussi modifier notre `ReplaceExternalServices` pour que notre HttpClient contacte maintenant, Microcks.
 
 ```cs
@@ -87,7 +147,7 @@ Vous pouvez lancer les tests, Vous aurez normalement des tests en erreur.
 
 ## Correction de l'erreur
 
-Microcks a une particularité en mode test Container, il est très \*\* sur le fait que le document doit être à l'exactitude de vos paramètres d'entrée dans l'URL, que ce soit par le path ou les query params.
+Microcks a une particularité en mode test Container, il est très rigoureux sur le fait que le document doit être à l'exactitude de vos paramètres d'entrée dans l'URL, que ce soit par les `path params` ou les `query params`.
 
 De ce fait, dans notre précédent schéma Open API, nous n'avions pas pris en compte les paramètres suivant :
 
