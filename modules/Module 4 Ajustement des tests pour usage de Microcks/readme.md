@@ -21,7 +21,7 @@ internal class InitWebApplicationFactory
 {
     ***
     private MicrocksContainer _microcksContainer = null!;
-    internal string _microcksUrl = "";
+    internal Uri _microcksUrl;
 ```
 
 Une fois cela fait, nous allons créer une nouvelle méthode privée pour démarrer le test Container:
@@ -31,13 +31,11 @@ Une fois cela fait, nous allons créer une nouvelle méthode privée pour démar
     {
         _microcksContainer = new MicrocksBuilder()
            .WithImage("quay.io/microcks/microcks-uber:1.10.0")
-            .WithMainArtifacts("C:\\Formation\\DotNetIntegrationTests\\MyApi\\MyApi.WebApi\\OpenAPIs\\openapi2.yml")
-            .WithSecondaryArtifacts("C:\\Formation\\DotNetIntegrationTests\\MyApi\\MyApi.WebApi.Tests\\Mocks\\OpenMeteo\\openmeteomocks.yml")
+            .WithMainArtifacts("openapi2.yml")
+            .WithSecondaryArtifacts("Mocks\\OpenMeteo\\openMeteoMocks.yml")
            .Build();
         await _microcksContainer.StartAsync();
-        Uri microcksURI = _microcksContainer.GetRestMockEndpoint("Open-Meteo APIs", "1.0/v1");
-        _microcksUrl = microcksURI.toString();
-
+        _microcksUrl = _microcksContainer.GetRestMockEndpoint("Open-Meteo APIs", "1.0/v1");
     }
 ```
 
@@ -104,11 +102,11 @@ Un test container est une méthode de test qui utilise des containers pour exéc
 Nous devons aussi modifier notre `ReplaceExternalServices` pour que notre HttpClient contacte maintenant, Microcks.
 
 ```cs
-  private static void ReplaceExternalServices(IServiceCollection services, ScenarioContext scenarioContext, string microcksUrl)
+  private static void ReplaceExternalServices(IServiceCollection services, ScenarioContext scenarioContext, Uri microcksUrl)
     {
         services.AddHttpClient<OpenMeteoApi>(client =>
         {
-            client.BaseAddress = new Uri(microcksUrl);
+            client.BaseAddress = microcksUrl;
         });
     }
 ```
