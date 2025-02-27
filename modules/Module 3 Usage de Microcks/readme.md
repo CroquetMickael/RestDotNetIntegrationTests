@@ -6,6 +6,12 @@ Démarrer avec le projet du module précédent:
 git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module2
 ```
 
+## Préambule
+
+Dans ce module, nous allons découvrir et utiliser Microcks pour la gestion de nos mocks API. Pour que cela fonctionne, nous aurons besoin de `Docker` ou `Podman` car Microcks propose principalement des images docker pour son usage prévu en CI/CD ou en CAAS (Container As A Service).
+
+Microcks bien que présenté ici en C#/.Net est utilisable en JAVA, NODE
+
 ## Démarrage du Docker Compose
 
 ### Podman

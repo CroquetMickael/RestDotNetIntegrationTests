@@ -10,6 +10,18 @@ git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --bra
 
 Vérifier que vous avez bien `Podman` ou `Docker` de lancer pour pouvoir continuer ce Module.
 
+### Faire des symlink des fichiers
+
+Faire clic droit sur `MyAPI.WebAPI.Tests` et faire ajouter `élément existant`:
+
+![Ajouter symlink](./img/symlinkadd.png)
+
+Sélectionner le fichier et faites le choix d'ajouter un lien vers le fichier.
+
+![Ajouter symlink windows](./img/symlinkaddwindows.png)
+
+Cela permettra de simplifier une fonction que nous allons intégrer plus tard.
+
 ## Ajout du package Microcks et usage du test Container
 
 Dans un premier temps, nous allons installer Microcks dans la solution de test, le package Nuget ce nomme : `Microcks.Testcontainers`
