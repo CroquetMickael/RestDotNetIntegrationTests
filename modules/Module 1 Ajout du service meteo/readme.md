@@ -64,15 +64,15 @@ Une fois cela fait, nous allons ajouter les 2 méthodes, la première sera en pu
 La deuxiéme fera du mapping de donnée.
 
 ```cs
-    public async Task<MeteoServiceObject> getMeteo(
+    public async Task<MeteoServiceObject> GetMeteo(
         float latitude,
         float longitude)
     {
         var response = await _openMeteo.ForecastAsync([], [Anonymous2.Temperature_2m_max, Anonymous2.Temperature_2m_min], latitude, longitude, false, Temperature_unit.Celsius, null, null, "GMT", null);
-        return mapOpenMeteoApiResponse(response);
+        return MapOpenMeteoApiResponse(response);
     }
 
-    private MeteoServiceObject mapOpenMeteoApiResponse(Response meteoApiResponse)
+    private MeteoServiceObject MapOpenMeteoApiResponse(Response meteoApiResponse)
     {
         var meteoService = new MeteoServiceObject();
         var WeatherDataByDay = new List<Temperature>();
@@ -83,9 +83,9 @@ La deuxiéme fera du mapping de donnée.
         {
             Temperature temperature = new Temperature
             {
-                min = $"{weatherData.Temperature_2m_min[i]}",
-                max = $"{weatherData.Temperature_2m_max[i]}",
-                date = weatherData.Time[i]
+                Min = $"{weatherData.Temperature_2m_min[i]}",
+                Max = $"{weatherData.Temperature_2m_max[i]}",
+                Date = weatherData.Time[i]
             };
             WeatherDataByDay.Add(temperature);
         }
@@ -113,20 +113,20 @@ namespace MyApi.WebApi.Services
 {
     public class MeteoServiceObject
     {
-        public double latitude { get; set; }
+        public double Latitude { get; set; }
 
-        public double longitude { get; set; }
+        public double Longitude { get; set; }
 
-        public IEnumerable<Temperature> temperature_By_Times  {get; set;}
+        public IEnumerable<Temperature> Temperature_By_Times  {get; set;}
     }
 
     public class Temperature
     {
-        public string date { get; set; }
+        public string Date { get; set; }
 
-        public string min { get; set; }
+        public string Min { get; set; }
 
-        public string max { get; set; }
+        public string Max { get; set; }
     }
 }
 ```
@@ -138,7 +138,7 @@ namespace MyApi.WebApi.Services
 {
     public interface IOpenMeteoService
     {
-        Task<MeteoServiceObject> getMeteo(
+        Task<MeteoServiceObject> GetMeteo(
             float latitude,
             float longitude);
     }
@@ -187,7 +187,7 @@ Une fois tout cela fait, nous ajoutons la route lié à notre appel de service d
     [Route("SevenDayMinMax")]
     public async Task<MeteoServiceObject?> Get([FromQuery] MeteoObject meteo)
     {
-        return await _openMeteoApi.getMeteo(meteo.latitude, meteo.longitude);
+        return await _openMeteoApi.GetMeteo(meteo.latitude, meteo.longitude);
     }
 ```
 
