@@ -64,7 +64,7 @@ Dans Microcks, les termes **primaryArtifact** et **secondaryArtifact** se réfè
 Définit par `WithMainArtifacts` dans notre fonction.
 
 - **Rôle** : Cet artéfact est utilisé pour générer les mocks d'API et pour effectuer des tests basés sur les spécifications qu'il contient. Il sert de base pour la simulation et le comportement attendu de l'API.
-- **Importance** : C'est l'élément central sur lequel repose l'ensemble de l'interaction avec l'API simulée.
+- **Importance** : C'est l'élément de base de notre API, il définit le contrat de service.
 
 #### Secondary Artifact
 
