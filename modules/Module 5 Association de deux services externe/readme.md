@@ -26,9 +26,18 @@ Ce qui va entrainer de l'ambiguité pour le SDK .net et il ne buildera plus la s
 
 L'option permet simplement de ne pas générer à nouveau les classes d'exception par défaut de `NSWAG` et ainsi ne pas créer cette ambiguité.
 
+## WithMainArtifact / WithSecondaryArtifact
+
+Les deux sous fonction de la création du container `Microcks` prennent plusieurs paramètres en entrée :
+
+```cs
+.WithMainArtifacts("openapi2.yml", "monAutreDefinitionDeService.yml")
+.WithSecondaryArtifacts("Mocks\\OpenMeteo\\openMeteoMocks.yml","monAutreMockDeMaDefinitionDeService.yml")
+```
+
 ## Le schema
 
-Voici le schema `Open API` de notre API GEOCODE, il y a plusieurs contrainte:
+Voici le schema `Open API` de notre API GEOCODE:
 
 <details>
 <summary>OPENAPI SCHEMA GEO CODE</summary>
