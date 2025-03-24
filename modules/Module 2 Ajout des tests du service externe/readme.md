@@ -80,9 +80,7 @@ Pour les Given:
     public void GivenTheMaximumTemperaturesAre(Table table)
     {
         var max = table.Rows.Select(row => row["Max"]).ToArray();
-
         _scenarioContext.Add("maximums", max);
-
     }
 
     [Given("The external service forecast respond")]
@@ -109,7 +107,6 @@ Pour les Given:
         };
 
         InitWebApplicationFactory.HttpMessageHandlerMeteoService.SetResponse(httpMessageResponse);
-
     }
 ```
 
@@ -150,6 +147,34 @@ public async Task ThenTheResponseWithLongitudeAndLatitude(double longitude, doub
 }
 ```
 
+## Ajout de la classe de de sérialisation Json pour simplifier notre comparaison de Json
+
+Il faut ajouter une classe que l'on nommera `SerializerOptions.cs` dans un dossier `Configurations` dans le projet de test, une fois cela fait remplissez le avec :
+
+```cs
+using System.Text.Encodings.Web;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+
+namespace MyApi.WebApi.Tests.Configurations;
+
+public static class SerializerOptions
+{
+    public static readonly JsonSerializerOptions SerializeOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    public static readonly JsonSerializerOptions DeserializeOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+}
+```
+
+Cette classe nous permet simplement de modifier les configuration de notre Serializer / Deserializer JSON dans le cadre de notre test, cela dépendra aussi de vos projets, dans notre cas, nous testons simplement que nous avons les mêmes objet JSON de chaque côté mais pas forcément l'ordre.
+
 ## Ajustement du InitWebApplicationFactory
 
 ### Ajout d'une classe de mock
@@ -171,7 +196,7 @@ namespace MyApi.WebApi.Tests.Utils
             _httpResponseMessage = httpResponseMessage;
         }
 
-        public void SetFailedAttemptsAndResponse(HttpResponseMessage httpResponseMessage, int nbError)
+        public void SetFailedAttemptsAndResponse(HttpResponseMessage httpResponseMessage)
         {
             _httpResponseMessage = httpResponseMessage;
         }
