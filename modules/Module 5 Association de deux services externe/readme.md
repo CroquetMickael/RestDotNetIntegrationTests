@@ -14,28 +14,7 @@ Notre client n'aime pas trop devoir rentrer une latitude / longitude pour trouve
 
 Cette API étant payante, pour des raisons de budget dans l'entreprise, nous aimerions que vous utilisiez ce que vous avez appris pour mocker le tout.
 
-## Information technique
-
-Quand vous allez ajouter votre service pensez bien à rajouter l'option suivante en plus des précédente: `/GenerateExceptionClasses:false`.
-
-### Pourquoi rajouter /GenerateExceptionClasses:false ?
-
-Ayant déjà rajouter un service, [NSWAG](https://github.com/RicoSuter/NSwag) l'outil qui s'occupe de la génération de notre client aura déjà généré les exceptions de base qu'il utilise pour le service `OpenMeteo` de ce fait, il y aura 2 fois `ApiExecption` dans la solution.
-
-Ce qui va entrainer de l'ambiguité pour le SDK .net et il ne buildera plus la solution.
-
-L'option permet simplement de ne pas générer à nouveau les classes d'exception par défaut de `NSWAG` et ainsi ne pas créer cette ambiguité.
-
-## WithMainArtifact / WithSecondaryArtifact
-
-Les deux sous fonction de la création du container `Microcks` prennent plusieurs paramètres en entrée :
-
-```cs
-.WithMainArtifacts("openapi2.yml", "monAutreDefinitionDeService.yml")
-.WithSecondaryArtifacts("Mocks\\OpenMeteo\\openMeteoMocks.yml","monAutreMockDeMaDefinitionDeService.yml")
-```
-
-## Le schema
+## Le schema de la nouvelle API
 
 Voici le schema `Open API` de notre API GEOCODE:
 
@@ -255,3 +234,30 @@ externalDocs:
 ```
 
 </details>
+
+## Information technique
+
+Quand vous allez ajouter votre service pensez bien à rajouter l'option suivante en plus des précédente: `/GenerateExceptionClasses:false`.
+
+### Pourquoi rajouter /GenerateExceptionClasses:false ?
+
+Ayant déjà rajouter un service, [NSWAG](https://github.com/RicoSuter/NSwag) l'outil qui s'occupe de la génération de notre client aura déjà généré les exceptions de base qu'il utilise pour le service `OpenMeteo` de ce fait, il y aura 2 fois `ApiExecption` dans la solution.
+
+Ce qui va entrainer de l'ambiguité pour le SDK .net et il ne buildera plus la solution.
+
+L'option permet simplement de ne pas générer à nouveau les classes d'exception par défaut de `NSWAG` et ainsi ne pas créer cette ambiguité.
+
+## WithMainArtifact / WithSecondaryArtifact
+
+Les deux sous fonction de la création du container `Microcks` prennent plusieurs paramètres en entrée :
+
+```cs
+.WithMainArtifacts("openapi2.yml", "monAutreDefinitionDeService.yml")
+.WithSecondaryArtifacts("Mocks\\OpenMeteo\\openMeteoMocks.yml","monAutreMockDeMaDefinitionDeService.yml")
+```
+
+## Pour résumer
+
+Nous voulons garder la route API créer dans le module 1, mais nous voulons que l'utilisateur renseigne une adresse qui appellera l'API "GeoCode" qui renverra alors une Latitude / Longitude lié à votre adresse que vous allez réutiliser pour rappeller le premier service que vous avez intégré au début "OpenMeteo"
+
+/!\ Pensez à bien réutiliser la même Longitude / Latitude dans vos mocks !

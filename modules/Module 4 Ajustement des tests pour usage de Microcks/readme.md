@@ -24,7 +24,7 @@ Cela permettra de simplifier une fonction que nous allons intégrer plus tard.
 
 ## Ajout du package Microcks et usage du test Container
 
-Dans un premier temps, nous allons installer Microcks dans la solution de test, le package Nuget ce nomme : `Microcks.Testcontainers`
+Dans un premier temps, vous devriez installer Microcks dans la solution de test, le package Nuget ce nomme : `Microcks.Testcontainers` pour un soucis de praticité, cela est déjà fait, vous avez juste à passer à la suite 😊.
 
 Une fois cela fait, nous allons modifier notre hook de démarrage, nous allons ajouter 2 paramètres, un public, l'autre privée qui seront utiliser pour démarrer le test container de Microcks.
 
@@ -691,10 +691,23 @@ components:
 
 </details>
 <br>
+
+### Mettre en "Always Copy" les fichiers .yml
+
+Assurer vous de bien mettre les fichiers .yml de votre Mock et dy symlink sur "Toujours copier"/"Always Copy" pour que les liens que vous avez fournit sois valide.
+
+![](./img/alwayscopy.png)
+
 Si vous relancez les tests, cela devrait maintenant être ok 😊.
+
+## Et si on faisait un peu de clean de notre test
+
+Comme vous vous en doutez, nous ne mockons plus via notre gherkin les réponses attendu du service, de ce fait, je vous invite à clean le gherkin et les steps associé.
 
 Un repo contenant une solution est disponible ici:
 
 ```
 git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module4
 ```
+
+[suivant >](../../modules/Module%205%20Association%20de%20deux%20services%20externe/readme.md)

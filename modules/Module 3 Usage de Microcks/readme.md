@@ -620,9 +620,7 @@ Dans Runner, vous avez 2 possibilité:
 
 - OPEN API SCEMA: Il effectue aussi un appel et il vérifie que la réponse est équivalente a ce que vous lui avez proposé dans votre mock.
 
-Vous pouvez tester les 2 cas, vous devriez normalement alors avoir 1 des 2 cas de test en succès.
-
-**Pourquoi ?** Il s'avére que l'API que nous utilisons ne respecte pas exactement le standard OPEN API, Microcks permet aussi de détecter ce genre de soucis.
+Tentez les deux !
 
 Un repo contenant une solution est disponible ici:
 

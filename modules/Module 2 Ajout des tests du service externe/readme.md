@@ -6,6 +6,8 @@ Démarrer avec le projet du module précédent:
 git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/module1
 ```
 
+Avant de démarrer le module, pensez à bien démarrer votre docker / podman, certains tests sont basé sur une base de donnée avec testContainers.
+
 ## Modification du gherkin
 
 Dans le fichier `WeatherWebApi.feature`, nous allons ajouter un scénario pour effectuer ce nouvel appel de service.
@@ -54,6 +56,8 @@ Scenario: Get weather forecast for 7 days
         | 2025-01-11 | 23,5 | 24,5 |
         | 2025-01-12 | 23,3 | 24,8 |
 ```
+
+/!\ Si votre Windows est en anglais, remplacez les valeurs de la dernière réponse en "," par des "."
 
 Puis dans le fichier `WeatherWebApi.cs`, nous ajoutons les steps associé à ce nouveau scénario.
 
