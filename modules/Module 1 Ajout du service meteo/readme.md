@@ -35,6 +35,12 @@ Puis remplir avec les informations suivante:
 
 Un fichier `.yml` va être généré avec le nom fournit, avec le nom que vous lui avez fournit, ici OpenMeteoApi donc `OpenMeteoApi.yml`
 
+En mettant les 2 propriété suivante dans notre génération de la classe de **service connecté**:
+
+`/GenerateBaseUrlProperty:false /useBaseUrl:false`
+
+Cela désactive le paramétrage automatique de l'URL dans la classe généré, permettant de travailler librement et donc de mettre une URL custom et mocké.
+
 ## Usage du nouveau service
 
 Dans le projet MyApi.WebApi, créer un dossier `Services` et ajouter 3 classes:
@@ -45,25 +51,23 @@ Dans le projet MyApi.WebApi, créer un dossier `Services` et ajouter 3 classes:
 
 Dans le fichier **OpenMeteoService**, nous allons modifier le constructeur pour récupérer via injection de dépendance l'objet générer par les **Service Connecté** et nous allons aussi permettre l'implémentation de l'interface que vous venez de créer.
 
-Nous irons modifier l'interface plus tard.
-
-```cs
-    public class OpenMeteoService : IOpenMeteoService
-    {
-        protected readonly OpenMeteoApi _openMeteo;
-
-        public OpenMeteoService(OpenMeteoApi openMeteo)
-        {
-            _openMeteo = openMeteo;
-        }
-    }
-```
-
-Une fois cela fait, nous allons ajouter les 2 méthodes, la première sera en public et permettra d'effectuer l'appel au service REST via l'objet injecté.
+Nous allons ajouter les 2 méthodes, la première sera en public et permettra d'effectuer l'appel au service REST via l'objet injecté.
 
 La deuxiéme fera du mapping de donnée.
 
 ```cs
+using MyApi.WebApi.Services;
+
+public class OpenMeteoService : IOpenMeteoService
+{
+
+    protected readonly OpenMeteoApi _openMeteo;
+
+    public OpenMeteoService(OpenMeteoApi openMeteo)
+    {
+        _openMeteo = openMeteo;
+    }
+
     public async Task<MeteoServiceObject> GetMeteo(
         float latitude,
         float longitude)
@@ -76,24 +80,23 @@ La deuxiéme fera du mapping de donnée.
     {
         var meteoService = new MeteoServiceObject();
         var WeatherDataByDay = new List<Temperature>();
-        meteoService.latitude = meteoApiResponse.Latitude;
-        meteoService.longitude = meteoApiResponse.Longitude;
-        WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(meteoApiResponse.Daily.ToString());
-        for (int i = 0; i < weatherData.Time.Count; i++)
+        meteoService.Latitude = meteoApiResponse.Latitude;
+        meteoService.Longitude = meteoApiResponse.Longitude;
+        DailyResponse dailyResponse = meteoApiResponse.Daily;
+        for (int i = 0; i < dailyResponse.Time.Count; i++)
         {
             Temperature temperature = new Temperature
             {
-                Min = $"{weatherData.Temperature_2m_min[i]}",
-                Max = $"{weatherData.Temperature_2m_max[i]}",
-                Date = weatherData.Time[i]
+                Min = $"{dailyResponse.Temperature_2m_min.ToArray()[i]}",
+                Max = $"{dailyResponse.Temperature_2m_max.ToArray()[i]}",
+                Date = dailyResponse.Time.ToArray()[i]
             };
             WeatherDataByDay.Add(temperature);
         }
-        meteoService.temperature_By_Times = WeatherDataByDay;
+        meteoService.Temperature_By_Times = WeatherDataByDay;
 
         return meteoService;
     }
-
 }
 
 public class WeatherData
@@ -159,11 +162,7 @@ builder.Services.AddHttpClient<OpenMeteoApi>(client =>
 });
 ```
 
-Pourquoi l'ajout de l'URL à la main, plus tard, quand nous voudrons tester, il faudra rajouter une URL custom, en mettant les 2 propriété suivante dans notre génération de la classe de **service connecté**:
-
-`/GenerateBaseUrlProperty:false /useBaseUrl:false`
-
-Cela désactive le paramétrage automatique de l'URL dans la classe généré, permettant de travailler librement et donc de mettre une URL custom et mocké.
+Pourquoi l'ajout de l'URL à la main, plus tard, quand nous voudrons tester, il faudra rajouter une URL custom
 
 ## Modification des controllers existants
 
@@ -180,6 +179,23 @@ Nous avons besoin de modifier le constructeur de la classe des controllers pour 
     }
 ```
 
+### Ajout du model de la query
+
+Nous allons devoir ajouter un model spécifique pour le QueryParam que nous allons ajouter dans notre controller, créer un dossier `Model` et ajoutez-y cette classe:
+
+```cs
+namespace MyApi.WebApi.Model;
+
+public class MeteoObject
+{
+
+    public float Latitude { get; set; } = 52.2f;
+
+    public float Longitude { get; set; } = 69.9f;
+
+}
+```
+
 Une fois tout cela fait, nous ajoutons la route lié à notre appel de service de notre côté.
 
 ```cs
@@ -187,7 +203,7 @@ Une fois tout cela fait, nous ajoutons la route lié à notre appel de service d
     [Route("SevenDayMinMax")]
     public async Task<MeteoServiceObject?> Get([FromQuery] MeteoObject meteo)
     {
-        return await _openMeteoApi.GetMeteo(meteo.latitude, meteo.longitude);
+        return await _openMeteoApi.GetMeteo(meteo.Latitude, meteo.Longitude);
     }
 ```
 
