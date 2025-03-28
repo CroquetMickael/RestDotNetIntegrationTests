@@ -1,66 +1,65 @@
-# Module 1: création du projet de test
+# Module 1 : création du projet de test
 
-## Qu'allons-nous faire?
+## Qu'allons-nous faire ?
 
-Nous allons ajouter un service externe nommé [Open Meteo](https://open-meteo.com/en/docs), qui par la suite sera mocké dans les tests.
+Nous allons ajouter une référence vers un service externe nommé [Open Meteo](https://open-meteo.com/en/docs), qui sera, par la suite, mocké dans les tests.
 
 ## Instructions
 
-Démarrer avec le projet en jouant la commande suivante:
+Récupérez le projet en executant la commande suivante :
 
 ```
 git clone https://github.com/CroquetMickael/RestDotNetIntegrationTests.git --branch feature/init
 ```
 
-Ajouter un service connecté via Visual studio
+Ouvrez la solution, puis ajoutez une référence de service connecté. La capture d'écran suivante est un exemple d'ajout de service sur Visual Studio 2022.
 
 ![ConnectedService](img/ConnectedService.png)
 
-Cliquer sur le +
+Après avoir double-cliqué sur "Connected Services", rendez vous dans la partie "Services References" et cliquez sur l'icône du "+" en haut à droite de l'encart concerné.
 
 ![Comment Ajouter un service](img/ConnectedServiceOpenAPI.png)
 
-Choisir OpenAPI
+Plusieurs choix vous sont proposés. Dans le cadre de notre projet, nous allons choisir "OpenAPI".
 
 ![Choix du type de service](img/ConnectedServiceAddOpenAPI.png)
 
-Puis remplir avec les informations suivante:
+L'éditeur vous demandera un ensemble d'informations pour ajouter le service que nous souhaitons connecter à notre solution. Voici les informations à renseigner :
 
-- URL: https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml
+- URL : https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml
 - Espace de noms du code généré : MyApi.WebApi.Services
-- C#
-- Option : /GenerateBaseUrlProperty:false /useBaseUrl:false
+- Nom de la classe pour le code généré : OpenMeteoApi
+- Langage de génération du code : C#
+- Options de génération du code supplémentaire : /GenerateBaseUrlProperty:false /useBaseUrl:false
 
 ![Informations du service](img/ConnectedServiceFinalAddOpenAPI.png)
 
-Un fichier `.yml` va être généré avec le nom fournit, avec le nom que vous lui avez fournit, ici OpenMeteoApi donc `OpenMeteoApi.yml`
+Un fichier `.yml` va être généré avec le nom fourni, ici OpenMeteoApi.
+Votre fichier généré sera donc `OpenMeteoApi.yml`
 
-En mettant les 2 propriété suivante dans notre génération de la classe de **service connecté**:
+Lorsque nous renseignons les propriétés `/GenerateBaseUrlProperty:false /useBaseUrl:false` dans la configuration de génération de la classe du **service connecté**, nous désactivons le paramétrage automatique de l'URL dans la classe générée. Cela nous permet de travailler librement et de définir une URL personnalisée et simulée.
 
-`/GenerateBaseUrlProperty:false /useBaseUrl:false`
+## Utilisation du nouveau service
 
-Cela désactive le paramétrage automatique de l'URL dans la classe généré, permettant de travailler librement et donc de mettre une URL custom et mocké.
+Dans le projet MyApi.WebApi, créer un dossier `Services` et ajoutez les 2 classes et l'interface suivantes :
 
-## Usage du nouveau service
+- OpenMeteoService.cs
+- MeteoServiceObject.cs
+- IOpenMeteoService.cs
 
-Dans le projet MyApi.WebApi, créer un dossier `Services` et ajouter 3 classes:
+Dans le fichier **OpenMeteoService**, nous allons modifier le constructeur pour injecter l'objet généré par les Services Connectés via l'injection de dépendance et permettre l'implémentation de l'interface que vous venez de créer.
+Nous allons ajouter deux méthodes : 
 
-- OpenMeteoService
-- MeteoServiceObject
-- IOpenMeteoService
-
-Dans le fichier **OpenMeteoService**, nous allons modifier le constructeur pour récupérer via injection de dépendance l'objet générer par les **Service Connecté** et nous allons aussi permettre l'implémentation de l'interface que vous venez de créer.
-
-Nous allons ajouter les 2 méthodes, la première sera en public et permettra d'effectuer l'appel au service REST via l'objet injecté.
-
-La deuxiéme fera du mapping de donnée.
+- la première sera publique et permettra d'effectuer l'appel au service REST via l'objet injecté
+- la deuxième sera responsable du mapping des données.
 
 ```cs
 using MyApi.WebApi.Services;
 
+namespace MyApi.WebApi.Services;
+
 public class OpenMeteoService : IOpenMeteoService
 {
-
     protected readonly OpenMeteoApi _openMeteo;
 
     public OpenMeteoService(OpenMeteoApi openMeteo)
@@ -107,52 +106,50 @@ public class WeatherData
 }
 ```
 
-Ce que nous avons fait ici, appeller le service via l'objet généré avec des données par défaut comme le fait d'avoir les degrés en Celsius, le mapping de la donnée ainsi qu'une classe pour permettre le mapping.
+Ici, nous avons appelé le service via l'objet généré avec des données par défaut, comme l'utilisation des degrés en Celsius, et de mapper les données à l'aide d'une classe dédiée.
 
-Vous verrez l'usage d'un type nommé `MeteoServiceObject` qui n'est pas présent dans cette classe, nous allons donc modifier / ajouter cette classe dans le même dossier.
+Vous remarquerez l'utilisation d'un type nommé `MeteoServiceObject` qui n'est pas présent dans cette classe. Nous allons donc ajouter cette classe dans le même dossier.
 
 ```cs
-namespace MyApi.WebApi.Services
+namespace MyApi.WebApi.Services;
+
+public class MeteoServiceObject
 {
-    public class MeteoServiceObject
-    {
-        public double Latitude { get; set; }
+    public double Latitude { get; set; }
 
-        public double Longitude { get; set; }
+    public double Longitude { get; set; }
 
-        public IEnumerable<Temperature> Temperature_By_Times  {get; set;}
-    }
+    public IEnumerable<Temperature> Temperature_By_Times  {get; set;}
+}
 
-    public class Temperature
-    {
-        public string Date { get; set; }
+public class Temperature
+{
+    public string Date { get; set; }
 
-        public string Min { get; set; }
+    public string Min { get; set; }
 
-        public string Max { get; set; }
-    }
+    public string Max { get; set; }
 }
 ```
 
-Et maintenant, allons modifier le fichier `IOpenMeteoService` qui est simplement l'interface de notre service, que nous utiliserons.
+Nous allons maintenant modifier l'interface `IOpenMeteoService`, contrat de notre service.
 
 ```cs
-namespace MyApi.WebApi.Services
+namespace MyApi.WebApi.Services;
+
+public interface IOpenMeteoService
 {
-    public interface IOpenMeteoService
-    {
-        Task<MeteoServiceObject> GetMeteo(
-            float latitude,
-            float longitude);
-    }
+    Task<MeteoServiceObject> GetMeteo(
+        float latitude,
+        float longitude);
 }
 ```
 
-## Ajout de l'injection de dépendance
+## Configuration de l'injection de dépendance
 
-Dans le Program.cs, nous allons ajouter l'injection de dépendance pour notre service, cela est découpé en deux temps.
+Dans le Program.cs, nous allons ajouter l'injection des dépendances de notre service.
 
-L'ajout de notre classe de service et son interface, puis l'ajout de l'HTTPClient pour notre service REST avec l'URL d'appel.
+Tout d'abord, nous allons ajouter les références nécessaires pour l'injection de notre service par son interface, puis la configuration de l'HTTPClient pour exploiter le service REST.
 
 ```cs
 builder.Services.AddTransient<IOpenMeteoService, OpenMeteoService>();
@@ -162,60 +159,59 @@ builder.Services.AddHttpClient<OpenMeteoApi>(client =>
 });
 ```
 
-Pourquoi l'ajout de l'URL à la main, plus tard, quand nous voudrons tester, il faudra rajouter une URL custom
+Nous configurons l'URL de base de notre HttpClient en dur dans le code. Lorsque nous serons à l'étape de test, nous ajouterons notre URL personnalisée.
 
-## Modification des controllers existants
+## Modification des controlleurs existants
 
-Nous avons besoin de modifier le constructeur de la classe des controllers pour que l'on puisse injecter le service.
+Nous avons besoin d'agrémenter le constructeur de la classe de notre controlleur afin d'injecter le service.
 
 ```cs
-    private readonly WeatherContext _weatherContext;
-    private readonly IOpenMeteoService _openMeteoApi;
+private readonly WeatherContext _weatherContext;
+private readonly IOpenMeteoService _openMeteoApi;
 
-    public WeatherForecastController(WeatherContext weatherContext, IOpenMeteoService openMeteoApi)
-    {
-        _weatherContext = weatherContext;
-        _openMeteoApi = openMeteoApi;
-    }
+public WeatherForecastController(WeatherContext weatherContext, IOpenMeteoService openMeteoApi)
+{
+    _weatherContext = weatherContext;
+    _openMeteoApi = openMeteoApi;
+}
 ```
 
-### Ajout du model de la query
+### Ajout du modèle de donnée de la requête
 
-Nous allons devoir ajouter un model spécifique pour le QueryParam que nous allons ajouter dans notre controller, créer un dossier `Model` et ajoutez-y cette classe:
+Il nous faut définir un modèle spécifique pour le `QueryParam` que nous allons ajouter dans notre controlleur.
+
+Créez un dossier `Model` et ajoutez-y cette classe :
 
 ```cs
 namespace MyApi.WebApi.Model;
 
 public class MeteoObject
 {
-
     public float Latitude { get; set; } = 52.2f;
-
     public float Longitude { get; set; } = 69.9f;
-
 }
 ```
 
-Une fois tout cela fait, nous ajoutons la route lié à notre appel de service de notre côté.
+Une fois toutes ces étapes réalisées, nous pouvons ajouter notre point d'entrée qui se chargera de l'appel du service.
 
 ```cs
-    [HttpGet]
-    [Route("SevenDayMinMax")]
-    public async Task<MeteoServiceObject?> Get([FromQuery] MeteoObject meteo)
-    {
-        return await _openMeteoApi.GetMeteo(meteo.Latitude, meteo.Longitude);
-    }
+[HttpGet]
+[Route("SevenDayMinMax")]
+public async Task<MeteoServiceObject?> Get([FromQuery] MeteoObject meteo)
+{
+    return await _openMeteoApi.GetMeteo(meteo.Latitude, meteo.Longitude);
+}
 ```
 
 ## Test via le Swagger
 
-Lancer le projet, vous arriverez sur le swagger:
+Lancez le projet. La configuration par défaut vous ammenera sur la page du Swagger :
 
 ![Swagger](img/Swagger.png)
 
-Mettez les 2 propriétés que vous souhaitez dans la `latitude` et `longitude`.
+Cliquez sur le bouton "Try it out", puis renseignez les valeurs de `latitude` et de `longitude`. Vous pouvez y inscrire les valeurs `double` que vous souhaitez.
 
-Vous devriez avoir une réponse de ce style :
+Voici un exemple de réponse validant l'appel du service :
 
 ```json
 {

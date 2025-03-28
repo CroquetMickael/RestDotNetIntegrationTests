@@ -1,20 +1,20 @@
-# Implémentation d'un service externe en REST et de test d'intégration avec et sans microcks
+# Implémentation d'un service REST externe et tests d'intégration avec et sans Microcks
 
 ## Objectifs
 
-Repartant du [DOJO](https://github.com/jtourvieille/DotNetIntegrationTests/tree/main) effectuer par [Jounad Tourvieille](https://github.com/jtourvieille)
+En repartant du [dojo](https://github.com/jtourvieille/DotNetIntegrationTests/tree/main) realisé par [Jounad Tourvieille](https://github.com/jtourvieille).
 
-Cette série de modules a pour vocation de fournir un template de test d'intégration vis-à-vis d'un service externe en REST. Les tests seront écrits en Gherkin. Chaque module couvre une partie applicative bien précise. Ils peuvent être pris indépendamment les uns des autres.
+Cette série de modules a pour objectif de fournir un modèle de test d'intégration pour un service externe REST. Les tests seront écrits en Gherkin. Chaque module couvre une partie applicative spécifique et peut être utilisé et travaillé indépendamment des autres.
 
 ## prérequis
 
-- Le framework .net 8
-- Un IDE (Visual Studio 2022 / Rider, ...)
+- Le framework .NET 8
+- Un IDE (Visual Studio 2022, Rider etc.)
 - Docker / Podman
 
 ## Pédagogie
 
-L'accompagnement sera très présent au début, puis s'atténuera progressivement.
+L'accompagnement sera soutenu au début, puis diminuera progressivement.
 
 ## Modules
 
