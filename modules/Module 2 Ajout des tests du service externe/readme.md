@@ -94,10 +94,10 @@ Pour les Given:
         _scenarioContext.TryGetValue("minimals", out String[] minimals);
         _scenarioContext.TryGetValue("maximums", out String[] maximums);
 
-        var mappedObject = new Dictionary<string, String[]>();
-        mappedObject.Add("time", days);
-        mappedObject.Add("temperature_2m_min", minimals);
-        mappedObject.Add("temperature_2m_max", maximums);
+        var mappedObject = new DailyResponse();
+        mappedObject.Time = [.. days];
+        mappedObject.Temperature_2m_min = [.. Array.ConvertAll(minimals, double.Parse)];
+        mappedObject.Temperature_2m_max = [.. Array.ConvertAll(maximums, double.Parse)];
 
         var httpResponse = new Response()
         {
@@ -123,8 +123,8 @@ public async Task WhenIMakeAGetRequestToWith(string endpoint, Table table)
     var client = _scenarioContext.Get<HttpClient>(InitWebApplicationFactory.HttpClientKey);
     NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
     var meteoObject = table.CreateInstance<MeteoObject>();
-    queryString.Add("latitude", meteoObject.latitude.ToString());
-    queryString.Add("longitude", meteoObject.longitude.ToString());
+    queryString.Add("latitude", meteoObject.Latitude.ToString());
+    queryString.Add("longitude", meteoObject.Longitude.ToString());
     var url = $"{endpoint}?{queryString.ToString()}";
     _scenarioContext.Add(ResponseKey, await client.GetAsync(url));
 }
@@ -146,8 +146,8 @@ public async Task ThenTheResponseWithLongitudeAndLatitude(double longitude, doub
     });
 
     Assert.NotNull(actual);
-    Assert.Equal(expected.Count(), actual.temperature_By_Times.Count());
-    Assert.Equal(JsonSerializer.Serialize(expected), JsonSerializer.Serialize(actual.temperature_By_Times));
+    Assert.Equal(expected.Count(), actual.Temperature_By_Times.Count());
+    Assert.Equal(JsonSerializer.Serialize(expected), JsonSerializer.Serialize(actual.Temperature_By_Times));
 }
 ```
 
@@ -256,16 +256,11 @@ Et pour finir, nous ajoutons cette méthode `ReplaceExternalServices` dans notre
  [BeforeScenario]
     public async Task BeforeScenario(ScenarioContext scenarioContext, IObjectContainer objectContainer)
     {
-        _msSqlContainer = new MsSqlBuilder().Build();
-        await _msSqlContainer.StartAsync();
-        await PopulateDatabaseAsync();
-        await InitializeRespawnAsync();
         var application = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.ConfigureTestServices(services =>
             {
                 RemoveLogging(services);
-                ReplaceDatabase(services, objectContainer);
                 ReplaceExternalServices(services);
             });
         });

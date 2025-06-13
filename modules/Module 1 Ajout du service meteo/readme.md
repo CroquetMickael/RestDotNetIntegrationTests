@@ -68,8 +68,8 @@ public class OpenMeteoService : IOpenMeteoService
     }
 
     public async Task<MeteoServiceObject> GetMeteo(
-        float latitude,
-        float longitude)
+        double latitude,
+        double longitude)
     {
         var response = await _openMeteo.ForecastAsync([], [Anonymous2.Temperature_2m_max, Anonymous2.Temperature_2m_min], latitude, longitude, false, Temperature_unit.Celsius, null, null, "GMT", null);
         return MapOpenMeteoApiResponse(response);
@@ -140,8 +140,8 @@ namespace MyApi.WebApi.Services;
 public interface IOpenMeteoService
 {
     Task<MeteoServiceObject> GetMeteo(
-        float latitude,
-        float longitude);
+        double latitude,
+        double longitude);
 }
 ```
 
@@ -166,12 +166,10 @@ Nous configurons l'URL de base de notre HttpClient en dur dans le code. Lorsque 
 Nous avons besoin d'agrémenter le constructeur de la classe de notre controlleur afin d'injecter le service.
 
 ```cs
-private readonly WeatherContext _weatherContext;
 private readonly IOpenMeteoService _openMeteoApi;
 
-public WeatherForecastController(WeatherContext weatherContext, IOpenMeteoService openMeteoApi)
+public WeatherForecastController(IOpenMeteoService openMeteoApi)
 {
-    _weatherContext = weatherContext;
     _openMeteoApi = openMeteoApi;
 }
 ```
@@ -187,8 +185,8 @@ namespace MyApi.WebApi.Model;
 
 public class MeteoObject
 {
-    public float Latitude { get; set; } = 52.2f;
-    public float Longitude { get; set; } = 69.9f;
+    public double Latitude { get; set; } = 52.2f;
+    public double Longitude { get; set; } = 69.9f;
 }
 ```
 

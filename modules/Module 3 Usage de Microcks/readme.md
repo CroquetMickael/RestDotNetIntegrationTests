@@ -69,7 +69,7 @@ Pour approfondir vos connaissances sur OpenAPI, vous pouvez consulter les ressou
 
 Créons un dossier `Mocks` et un sous dossier `OpenMeteo` dans le projet de test .net à la racine.
 
-Dupliquer le `.yml` qui est sur cette URL: [https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml](https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml) dans un fichier que vous nommerez `openmeteomocks.yml`.
+Dupliquer le `.yml` qui est sur cette URL: [https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml](https://raw.githubusercontent.com/open-meteo/open-meteo/refs/heads/main/openapi.yml) dans un fichier que vous nommerez `openMeteoMocks.yml`.
 
 Une fois cela fait, nous modifions le fichier pour y rajouter des examples:
 

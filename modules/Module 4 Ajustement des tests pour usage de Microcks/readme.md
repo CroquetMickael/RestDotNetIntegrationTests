@@ -43,7 +43,7 @@ Une fois cela fait, nous allons créer une nouvelle méthode privée pour démar
     {
         _microcksContainer = new MicrocksBuilder()
            .WithImage("quay.io/microcks/microcks-uber:1.10.0")
-            .WithMainArtifacts("openapi2.yml")
+            .WithMainArtifacts("openapi.yml")
             .WithSecondaryArtifacts("Mocks\\OpenMeteo\\openMeteoMocks.yml")
            .Build();
         await _microcksContainer.StartAsync();
@@ -114,7 +114,7 @@ Un test container est une méthode de test qui utilise des containers pour exéc
 Nous devons aussi modifier notre `ReplaceExternalServices` pour que notre HttpClient contacte maintenant, Microcks.
 
 ```cs
-  private static void ReplaceExternalServices(IServiceCollection services, ScenarioContext scenarioContext, Uri microcksUrl)
+  private static void ReplaceExternalServices(IServiceCollection services, Uri microcksUrl)
     {
         services.AddHttpClient<OpenMeteoApi>(client =>
         {
@@ -131,18 +131,13 @@ Et pour finir, nous devons démarrer le container au début de chaque scénario,
 [BeforeScenario]
     public async Task BeforeScenario(ScenarioContext scenarioContext, IObjectContainer objectContainer)
     {
-        _msSqlContainer = new MsSqlBuilder().Build();
-        await _msSqlContainer.StartAsync();
-        await PopulateDatabaseAsync();
-        await InitializeRespawnAsync();
         await CreateApiTestcontainer();
         var application = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.ConfigureTestServices(services =>
             {
                 RemoveLogging(services);
-                ReplaceDatabase(services, objectContainer);
-                ReplaceExternalServices(services, scenarioContext, _microcksUrl);
+                ReplaceExternalServices(services, _microcksUrl);
             });
         });
 
@@ -165,7 +160,7 @@ De ce fait, dans notre précédent schéma Open API, nous n'avions pas pris en c
 - temperature_unit
 - timezone
 
-Il faut donc rajouter des examples dans notre `openmeteomocks.yml` pour ces trois paramêtres pour notre `minmaxdaily` avec les valeurs suivante:
+Il faut donc rajouter des examples dans notre `openMeteoMocks.yml` pour ces trois paramêtres pour notre `minmaxdaily` avec les valeurs suivante:
 
 - current_weather = false
 - temperature_unit = celsius
@@ -694,7 +689,7 @@ components:
 
 ### Mettre en "Always Copy" les fichiers .yml
 
-Assurer vous de bien mettre les fichiers .yml de votre Mock et dy symlink sur "Toujours copier"/"Always Copy" pour que les liens que vous avez fournit sois valide.
+Assurer vous de bien mettre les fichiers .yml de votre Mock et du symlink sur "Toujours copier"/"Always Copy" pour que les liens que vous avez fournit sois valide.
 
 ![](./img/alwayscopy.png)
 
