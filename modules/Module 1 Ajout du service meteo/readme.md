@@ -68,8 +68,8 @@ public class OpenMeteoService : IOpenMeteoService
     }
 
     public async Task<MeteoServiceObject> GetMeteo(
-        float latitude,
-        float longitude)
+        double latitude,
+        double longitude)
     {
         var response = await _openMeteo.ForecastAsync([], [Anonymous2.Temperature_2m_max, Anonymous2.Temperature_2m_min], latitude, longitude, false, Temperature_unit.Celsius, null, null, "GMT", null);
         return MapOpenMeteoApiResponse(response);
@@ -140,8 +140,8 @@ namespace MyApi.WebApi.Services;
 public interface IOpenMeteoService
 {
     Task<MeteoServiceObject> GetMeteo(
-        float latitude,
-        float longitude);
+        double latitude,
+        double longitude);
 }
 ```
 
@@ -187,8 +187,8 @@ namespace MyApi.WebApi.Model;
 
 public class MeteoObject
 {
-    public float Latitude { get; set; } = 52.2f;
-    public float Longitude { get; set; } = 69.9f;
+    public double Latitude { get; set; } = 52.2f;
+    public double Longitude { get; set; } = 69.9f;
 }
 ```
 
